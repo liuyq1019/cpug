@@ -1,0 +1,23 @@
+server:
+  port: 8360
+ 
+spring:
+  kafka:
+    producer:
+      bootstrap-servers: #生产者配置
+      - 10.106.140.16:9092
+      retries: 0
+      batch-size: 4096
+      buffer-memory: 40960
+      
+  
+    consumer:
+      bootstrap-servers: 
+      - 10.106.140.16:9092
+      enable-auto-commit: true #指定消息被消费之后自动提交偏移量（即消息的编号，表示消费到了哪个位置，消费者每消费完一条消息就会向kafka服务器汇报自己消消费到的那个消息的编号，以便于下次继续消费）
+      group-id: car #消费者组
+      auto-offset-reset: latest #从最近的地方开始消费
+      auto-commit-interval: 100
+      max-poll-records: 1
+      
+     
