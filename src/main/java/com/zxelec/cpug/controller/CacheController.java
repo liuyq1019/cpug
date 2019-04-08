@@ -18,9 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson.JSONObject;
 import com.zxelec.cpug.cache.CameraCache;
 import com.zxelec.cpug.cache.SubscribeCache;
+import com.zxelec.cpug.cache.TollgateCache;
 import com.zxelec.cpug.entity.rest.DafaCarPushReq;
 import com.zxelec.cpug.entity.rest.DahuaSubscribeRsp;
-import com.zxelec.cpug.service.DafaCarpassPushService;
+import com.zxelec.cpug.service.DahuaCarpassPushService;
 import com.zxelec.cpug.util.RestDigestClient;
 
 /**
@@ -40,19 +41,22 @@ public class CacheController {
 	
 	@Autowired
 	private SubscribeCache subscribeCache;
+	
+	@Autowired
+	private TollgateCache tollgateCache;
 	/**
 	 * 查看缓存信息
 	 */
 	@RequestMapping("/cache/{type}")
 	public String queryCache(@PathVariable("type") String type) {
-		if("visscam".equals(type)) {
+		if("cam".equals(type)) {
 			return JSONObject.toJSONString(cameraCache.getAllCameraList());
 		}else if("subscribe".equals(type)) {
-			return JSONObject.toJSONString(subscribeCache.getAllSubscribeData());
-		}else if("sendDevice".equals(type)) {
-			return JSONObject.toJSONString(subscribeCache.getAllCamJson());
+			return JSONObject.toJSONString(subscribeCache.getAllSubscribeInfo());
+		}else if("tollgate".equals(type)) {
+			return JSONObject.toJSONString(tollgateCache.getAll());
 		}
-		return "type信息不正确!【visscam,subscribe,sendDevice】";
+		return "type信息不正确!【cam,subscribe,tollgate】";
 	}
 	
 	
@@ -74,7 +78,7 @@ public class CacheController {
 	
 	
 	@Autowired
-	private DafaCarpassPushService dafaCarpassPushService;
+	private DahuaCarpassPushService dahuaCarpassPushService;
 	
 	@Autowired
 	private RestDigestClient restDigestClient;
@@ -93,7 +97,7 @@ public class CacheController {
 	@RequestMapping("/test")
 	public String exectorTest() {
 		logger.info("多线程测试start");
-		dafaCarpassPushService.executeAsync();
+		dahuaCarpassPushService.executeAsync();
 		logger.info("多线程测试 end ");
 		return "测试";
 	}

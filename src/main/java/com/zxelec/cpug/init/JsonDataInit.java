@@ -27,41 +27,18 @@ import com.zxelec.cpug.util.JsonUtils;
  *
  */
 @Service
-public class JsonDataInit implements Runnable{
-	private Logger logger = LogManager.getLogger(JsonDataInit.class);
+public class JsonDataInit{
 	@Value("classpath:dahua/data.json")
 	private Resource areaRes;
 	
-	@Value("classpath:dahua/cam.json")
-	private Resource camRes;
 	@Autowired
 	private SubscribeCache subscribeCache;
 	
-	@Override
-	public void run() {
+	@PostConstruct
+	public void init() {
 		this.subscribeJsonInit();
-		this.camJsonInit();
 	}
 	
-	private void camJsonInit() {
-		try {
-			File file = camRes.getFile();
-			String jsonData = JsonUtils.jsonRead(file);
-			if (!StringUtils.isEmpty(jsonData)) {
-				List<DeviceList> devList = new ArrayList<>();
-				JSONArray array = JSONArray.parseArray(jsonData);
-				for (int i = 0; i < array.size(); i++) {
-					JSONObject jsonObject2 = array.getJSONObject(i);
-					DeviceList m = JSONObject.toJavaObject(jsonObject2, DeviceList.class);
-					logger.info(JSONObject.toJSONString(m));
-					devList.add(m);
-				}
-				subscribeCache.putCamJson(devList);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 	
 	
 	/**

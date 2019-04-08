@@ -8,14 +8,15 @@ import javax.annotation.PostConstruct;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zxelec.cpug.cache.CameraCache;
+import com.zxelec.cpug.cache.TollgateCache;
 import com.zxelec.cpug.entity.rest.CameraRows;
+import com.zxelec.cpug.entity.rest.TollgateRows;
 import com.zxelec.cpug.entity.rest.VissCpbsBean;
 import com.zxelec.cpug.entity.rest.VissCpbsResponseStatus;
 import com.zxelec.cpug.util.CustomServerProperties;
@@ -36,6 +37,9 @@ public class CpbsBasicDataInit{
 	
 	@Autowired
 	private CameraCache cameraCache;
+	
+	@Autowired
+	private TollgateCache tollgateCache;
 
 	@Autowired
 	private RestDigestClient restDigestClient;
@@ -43,12 +47,13 @@ public class CpbsBasicDataInit{
 	
 	@PostConstruct
 	public void init() {
-		sendCpbs();
+		this.sendCpbsCam();
+		this.sendCpbsTollgate();
 	}
 	/**
 	 * 每天定时从cpbs获取设备列表数据
 	 */
-	public void sendCpbs() {
+	public void sendCpbsCam() {
 		VissCpbsBean<CameraRows> vissCpbsBean = null;
 		String url = customServerProperties.getCpugCpbsUrl() + "rest/Camera";
 		String username = customServerProperties.getCpugVissUsername();
@@ -70,6 +75,36 @@ public class CpbsBasicDataInit{
 				}
 			} else {// 如果出现null表示有异常，则休眠30分钟后重新获取
 				logger.error("获取数据CAM失败："+respBody);
+			}
+		}catch (RuntimeException e) {
+			logger.error("程序运行时异常:"+e.getMessage());
+		}
+	}
+	
+	/**
+	 * 获取卡口数据
+	 */
+	public void sendCpbsTollgate() {
+		String url = customServerProperties.getCpugCpbsUrl() + "rest/Tollgate";
+		String username = customServerProperties.getCpugVissUsername();
+		String password = Md5Encrypt.encrypt(customServerProperties.getCpugVissPassword());
+		String respBody = restDigestClient.sendGetVissDigest(url, username, password);
+		try {
+			VissCpbsBean<TollgateRows> vissCpbsBean = null;
+			if (!StringUtils.isEmpty(respBody)) {
+				vissCpbsBean = JSONObject.parseObject(respBody, VissCpbsBean.class);
+				VissCpbsResponseStatus statusBean = vissCpbsBean.getResponseStatus();
+				if (statusBean != null && "0".equals(statusBean.getStatusCode())) {
+					List<TollgateRows> tollgateRows = vissCpbsBean.getRows();
+					if(tollgateRows!=null) {
+						List<TollgateRows> tollgateList = JSONArray.parseArray(JSONObject.toJSONString(tollgateRows),TollgateRows.class);
+						tollgateCache.put(tollgateList);
+					}
+				} else {// 其他状态表示需要重新获取
+					logger.error("获取失败:"+JSONObject.toJSONString(statusBean));
+				}
+			} else {// 如果出现null表示有异常，则休眠30分钟后重新获取
+				logger.error("获取数据Tollgate失败："+respBody);
 			}
 		}catch (RuntimeException e) {
 			logger.error("程序运行时异常:"+e.getMessage());

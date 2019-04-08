@@ -3,6 +3,7 @@ package com.zxelec.cpug.cache;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -11,24 +12,26 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.springframework.stereotype.Component;
 
 import com.zxelec.cpug.entity.rest.DafaCamPushEntity;
-import com.zxelec.cpug.entity.rest.DeviceList;
 import com.zxelec.cpug.entity.rest.Subscribe;
-
 
 @Component
 public class SubscribeCache {
 	
-	
-	private Map<String, Subscribe> subMap = new ConcurrentHashMap<String, Subscribe>();
-	private Map<String, List<Subscribe>> allSubscribeData = new ConcurrentHashMap<String, List<Subscribe>>();
-	
-	private Map<String, DeviceList> camDeviceMap = new ConcurrentHashMap<String, DeviceList>();
-	private Map<String, List<DeviceList>> camAllDeviceMap = new ConcurrentHashMap<String, List<DeviceList>>();
+	/**
+	 * 订阅信息
+	 */
+	private Map<String, Subscribe> subMap = new ConcurrentHashMap<>();
+	/**
+	 * 发送给大华的设备信息
+	 */
+//	private Map<String, DafaCamPushEntity> camDeviceMap = new ConcurrentHashMap<>();
 	
 	
 	private ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+
 	/**
 	 * 将所有的订阅放入缓存
+	 * 
 	 * @param subscribeReq
 	 */
 	public void putSubscribeInfo(List<Subscribe> subList) {
@@ -36,80 +39,35 @@ public class SubscribeCache {
 		try {
 			writeLock.lock();
 			subMap.clear();
-			allSubscribeData.clear();
 			for (Subscribe subscribe : subList) {
 				subMap.put(subscribe.getSubscribeID(), subscribe);
 			}
-			allSubscribeData.put("subscribeList", subList);
-		}finally{
+		} finally {
 			writeLock.unlock();
 		}
 	}
+
 	/**
-	 * json device 数据
-	 * @param subList
+	 * 数据当个存入
+	 * 
+	 * @param key
+	 *            getSubscribeID
+	 * @param value
+	 *            subscribe
 	 */
-	public void putCamJson(List<DeviceList> devList) {
+	public void put(String key, Subscribe value) {
 		Lock writeLock = readWriteLock.writeLock();
 		try {
 			writeLock.lock();
-			camDeviceMap.clear();
-			for (DeviceList device : devList) {
-				camDeviceMap.put(device.getDeviceID(), device);
-			}
-			camAllDeviceMap.put("camAllDevice", devList);
-		}finally{
+			subMap.put(key, value);
+		} finally {
 			writeLock.unlock();
 		}
 	}
-	/**
-	 * 获取设备全部的数据
-	 * @return
-	 */
-	public Map<String,DeviceList> getAllCamDeviceMap(){
-		Lock readLock = readWriteLock.readLock();
-		try {
-			readLock.lock();
-			return camDeviceMap;
-		}finally{
-			readLock.unlock();
-		}
-	}
-	
-	/**
-	 * 获取指定device信息
-	 * @param subList
-	 */
-	public DeviceList getCamJson(String device) {
-		Lock readLock = readWriteLock.readLock();
-		try {
-			readLock.lock();
-			return camDeviceMap.get(device);
-		}finally{
-			readLock.unlock();
-		}
-	}
-	/**
-	 * 获取全部发送给大华Device信息
-	 * @return
-	 */
-	public List<DeviceList> getAllCamJson(){
-		Lock readLock = readWriteLock.readLock();
-		try {
-			readLock.lock();
-			List<DeviceList> allList = camAllDeviceMap.get("camAllDevice");
-			if(allList == null) {
-				allList = new ArrayList<>();
-			}
-			return allList;
-		}finally{
-			readLock.unlock();
-		}
-	}
-	
-	
+
 	/**
 	 * 通过订阅标识符获取数据
+	 * 
 	 * @param subscribeID
 	 * @return
 	 */
@@ -118,43 +76,92 @@ public class SubscribeCache {
 		try {
 			readLock.lock();
 			return subMap.get(subscribeID);
-		}finally{
+		} finally {
 			readLock.unlock();
 		}
 	}
+
 	/**
 	 * 获取全部订阅信息
+	 * 
 	 * @return Map对象 key SubscribeID
 	 */
-	public Map<String, Subscribe> getAllSubscribeInfo(){
+	public Map<String, Subscribe> getAllSubscribeInfo() {
 		Lock readLock = readWriteLock.readLock();
 		try {
 			readLock.lock();
 			return subMap;
-		}finally{
+		} finally {
 			readLock.unlock();
 		}
 	}
-	
-	
+
 	/**
-	 * 获取所有的订阅信息
+	 * 将map对象转换为list
+	 * 
 	 * @return
 	 */
-	public List<Subscribe> getAllSubscribeData(){
+	public List<Subscribe> getAllSubscribeList() {
 		Lock readLock = readWriteLock.readLock();
+		List<Subscribe> list = new ArrayList<>();
 		try {
 			readLock.lock();
-			List<Subscribe> allList = allSubscribeData.get("subscribeList");
-			if(allList == null) {
-				allList = new ArrayList<>();
+			for (Entry<String, Subscribe> entry : subMap.entrySet()) {
+				list.add(entry.getValue());
 			}
-			return allList;
-		}finally{
+			return list;
+		} finally {
 			readLock.unlock();
 		}
 	}
 	
 	
-	
+//	/**
+//	 * json device 数据
+//	 * 
+//	 * @param subList
+//	 */
+//	public void putCamJson(List<DafaCamPushEntity> devList) {
+//		Lock writeLock = readWriteLock.writeLock();
+//		try {
+//			writeLock.lock();
+//			camDeviceMap.clear();
+//			for (DafaCamPushEntity dafaCamPushEntity : devList) {
+//				camDeviceMap.put(dafaCamPushEntity.getSubscribeID(), dafaCamPushEntity);
+//			}
+//		} finally {
+//			writeLock.unlock();
+//		}
+//	}
+//
+//	/**
+//	 * 获取指定device信息
+//	 * 
+//	 * @param subList
+//	 */
+//	public DafaCamPushEntity getCamJson(String subscribeID) {
+//		Lock readLock = readWriteLock.readLock();
+//		try {
+//			readLock.lock();
+//			return camDeviceMap.get(subscribeID);
+//		} finally {
+//			readLock.unlock();
+//		}
+//	}
+//
+//	/**
+//	 * 获取全部发送给大华Device信息
+//	 * 
+//	 * @return
+//	 */
+//	public Map<String, DafaCamPushEntity> getAllCamJson() {
+//		Lock readLock = readWriteLock.readLock();
+//		try {
+//			readLock.lock();
+//			return camDeviceMap;
+//		} finally {
+//			readLock.unlock();
+//		}
+//	}
+
 }

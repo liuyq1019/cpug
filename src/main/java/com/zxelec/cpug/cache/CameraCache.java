@@ -47,20 +47,20 @@ public class CameraCache {
 	 * @param id 
 	 * @return
 	 */
-	public CameraRows getCamera(String id) {
-		Lock readLock = readWriteLock.readLock();
-		try {
-			readLock.lock();
-			CameraRows cam = camMap.get(id);//通过内部编号获取
-			if(cam == null) {//内部编号为null时使用国标获取
-				return externalMap.get(id);
-			}else {
-				return cam;
-			}
-		}finally{
-			readLock.unlock();
-		}
-	}
+//	public CameraRows getCamera(String id) {
+//		Lock readLock = readWriteLock.readLock();
+//		try {
+//			readLock.lock();
+//			CameraRows cam = camMap.get(id);//通过内部编号获取
+//			if(cam == null) {//内部编号为null时使用国标获取
+//				return externalMap.get(id);
+//			}else {
+//				return cam;
+//			}
+//		}finally{
+//			readLock.unlock();
+//		}
+//	}
 	/**
 	 * 获取全量相机数据
 	 * @return
