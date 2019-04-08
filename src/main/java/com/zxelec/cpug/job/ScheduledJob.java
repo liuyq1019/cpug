@@ -40,8 +40,13 @@ public class ScheduledJob {
 		dahuaCarpassPushService.sendCamDahua(camList);
 		//订阅信息需要是卡口订阅，且为开启订阅状态
 		List<Subscribe> tollgateList = subList.stream()
-											  .filter(c -> ("2".equals(c.getSubscribeCategory())&& 0 == c.getCancelFlag()))
+											  .filter(c -> ("5".equals(c.getSubscribeCategory())&& 0 == c.getCancelFlag()))
 											  .collect(Collectors.toList());
 		dahuaCarpassPushService.sendTollgateDahua(tollgateList);
+		//订阅信息需要是卡口订阅，且为开启订阅状态
+		List<Subscribe> laneList = subList.stream()
+											  .filter(c -> ("6".equals(c.getSubscribeCategory())&& 0 == c.getCancelFlag()))
+											  .collect(Collectors.toList());
+		dahuaCarpassPushService.sendLaneDahua(laneList);
 	}
 }

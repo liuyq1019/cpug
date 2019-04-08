@@ -22,7 +22,7 @@ import com.zxelec.cpug.util.DateUtils;
  *
  */
 @RestController
-public class DafaSubscribeController {
+public class DahuaSubscribeController {
 	@Autowired
 	private DahuaCarpassPushService dahuaCarpassPushService;
 	
