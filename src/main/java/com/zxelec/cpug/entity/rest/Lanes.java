@@ -3,8 +3,8 @@ package com.zxelec.cpug.entity.rest;
 import com.alibaba.fastjson.annotation.JSONField;
 
 public class Lanes {
-	@JSONField(name = "Id")
-	private int id;
+	@JSONField(name = "laneId")
+	private int laneId;
 	@JSONField(name = "LaneNo")
 	private int laneNo;
 	@JSONField(name = "Name")
@@ -25,11 +25,12 @@ public class Lanes {
 	private int maxSpeed2;
 	@JSONField(name = "minSpeed")
 	private String minSpeed;
-	public int getId() {
-		return id;
+	
+	public int getLaneId() {
+		return laneId;
 	}
-	public void setId(int id) {
-		this.id = id;
+	public void setLaneId(int laneId) {
+		this.laneId = laneId;
 	}
 	public int getLaneNo() {
 		return laneNo;

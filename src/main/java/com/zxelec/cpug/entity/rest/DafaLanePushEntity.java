@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
-public class DafaTollgatePushEntity {
+public class DafaLanePushEntity {
 	@JSONField(name="NotificationID")
 	private String notificationID;
 	@JSONField(name="SubscribeID")
@@ -14,8 +14,8 @@ public class DafaTollgatePushEntity {
 	private String title;
 	@JSONField(name="TriggerTime",format="yyyy-MM-dd HH:mm:ss")
 	private Date triggerTime;
-	@JSONField(name="TollgateList")
-	private List<TollgateList> tollgateList;
+	@JSONField(name="LaneList")
+	private List<LaneList> laneList;
 	public String getNotificationID() {
 		return notificationID;
 	}
@@ -40,13 +40,12 @@ public class DafaTollgatePushEntity {
 	public void setTriggerTime(Date triggerTime) {
 		this.triggerTime = triggerTime;
 	}
-	public List<TollgateList> getTollgateList() {
-		return tollgateList;
+	public List<LaneList> getLaneList() {
+		return laneList;
 	}
-	public void setTollgateList(List<TollgateList> tollgateList) {
-		this.tollgateList = tollgateList;
+	public void setLaneList(List<LaneList> laneList) {
+		this.laneList = laneList;
 	}
-	
 
 	
 }

@@ -31,6 +31,7 @@ import com.zxelec.cpug.cache.SubscribeCache;
 import com.zxelec.cpug.entity.rest.CarpassPushEntity;
 import com.zxelec.cpug.entity.rest.DafaCamPushEntity;
 import com.zxelec.cpug.entity.rest.DafaCarPushReq;
+import com.zxelec.cpug.entity.rest.DafaLanePushEntity;
 import com.zxelec.cpug.entity.rest.DafaTollgatePushEntity;
 import com.zxelec.cpug.entity.rest.DahuaSubscribeRsp;
 import com.zxelec.cpug.entity.rest.ImagePicLoad;
@@ -62,13 +63,12 @@ public class RestDigestClient {
 		List<Subscribe> listSub = subscribeCache.getAllSubscribeList();
 		//需要状态为订阅且接口为过车
 		List<Subscribe> sList = listSub.stream()
-				.filter(c -> (0 == c.getStatus()&& "3" == c.getSubscribeCategory()))
+				.filter(c -> (0 == c.getCancelFlag()&& "3" == c.getSubscribeCategory()))
 				.collect(Collectors.toList());
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		try {
 			for (Subscribe subscribe : sList) {
 				String subscribeID = subscribe.getSubscribeID();
-				
 				List<DafaCarPushReq> list = new ArrayList<>();
 				DafaCarPushReq req = new DafaCarPushReq();
 				String url = subscribe.getReceiveAddr();
@@ -131,6 +131,10 @@ public class RestDigestClient {
 			for (DafaCamPushEntity dafaCamPushEntity : dafaSendList) {
 				List<DafaCamPushEntity> sendList = new ArrayList<>();
 				Subscribe subscribe = subscribeCache.getSubscribeInfo(dafaCamPushEntity.getSubscribeID());
+				if(subscribe == null || subscribe.getCancelFlag()==1) {//找不到或者为未订阅都不进行发送
+					logger.info("未找到订阅或者是未进行订阅:"+JSONObject.toJSONString(dafaCamPushEntity));
+					return;
+				}
 				String url = subscribe.getReceiveAddr();
 				String subscribeID =  dafaCamPushEntity.getSubscribeID();
 				//大华傻逼操作
@@ -181,7 +185,71 @@ public class RestDigestClient {
 	
 	
 	/**
-	 * 发送device信息
+	 * 发送车道信息
+	 * @param listCamDevice
+	 * @param subList
+	 */
+	public void sendNoDigestDafaLane(List<DafaLanePushEntity> dafaSendList) {
+		CloseableHttpClient httpclient = HttpClients.createDefault();
+		try {
+			for (DafaLanePushEntity dafaLanePushEntity : dafaSendList) {
+				List<DafaLanePushEntity> sendList = new ArrayList<>();
+				Subscribe subscribe = subscribeCache.getSubscribeInfo(dafaLanePushEntity.getSubscribeID());
+				if(subscribe == null || subscribe.getCancelFlag()==1) {
+					logger.info("未找到订阅或者是未进行订阅:"+JSONObject.toJSONString(dafaLanePushEntity));
+					return;
+				}
+				String url = subscribe.getReceiveAddr();
+				String subscribeID =  dafaLanePushEntity.getSubscribeID();
+				//大华傻逼操作
+				//新增返回路径http://10.104.189.104:8300/VIID/Triggers/Subscribes/22020000000020190408144515033117/SubscribeNotifications
+				//修改返回路径http://10.104.189.104:8300/VIID/
+				if(!url.contains(subscribeID)) {//新增时调用返回路径
+					url = url +  customServerProperties.getCpugDafaPrefixAddress()
+					+ subscribe.getSubscribeID() + customServerProperties.getCpugDafaSuffixAddress();
+				}
+				HttpPost httpPost = new HttpPost(url);
+				sendList.add(dafaLanePushEntity);
+				String body = JSONObject.toJSONString(sendList);
+				StringEntity strentity = new StringEntity(body, "utf-8");
+				strentity.setContentType("application/json;charset=UTF-8");
+				httpPost.setEntity(strentity);
+				httpPost.setHeader("Content-type", "application/json;charset=UTF-8");
+				try {
+					httpPost.setConfig(this.setRequestConfig());
+					HttpResponse response = httpclient.execute(httpPost);
+					if (response.getStatusLine().getStatusCode() == 200) {
+						String eng = EntityUtils.toString(response.getEntity(), "UTF-8");
+						DahuaSubscribeRsp subRsp = JSONObject.parseObject(eng, DahuaSubscribeRsp.class);
+						if (!"0".equals(subRsp.getStatusCode())) {
+							logger.error("发送数据：【" + JSONObject.toJSONString(sendList) + "】 \n" + "通知失败："
+									+ JSONObject.toJSONString(subRsp));
+						}else {
+							logger.info(JSONObject.toJSONString(sendList));
+						}
+					} else {
+						logger.error("发送数据：【" + JSONObject.toJSONString(sendList) + "】\n " + "响应失败："
+								+ response.getStatusLine().getStatusCode());
+					}
+				} catch (IOException e) {
+					logger.error("发送数据：【" + JSONObject.toJSONString(sendList) + "】\n " + "未知异常sendNoDigestDafaCar:"
+							+ e.getMessage());
+				}
+			}
+		} finally {
+			try {
+				if (null != httpclient) {
+					httpclient.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	
+	/**
+	 * 发送卡口信息
 	 * @param listCamDevice
 	 * @param subList
 	 */
@@ -191,6 +259,10 @@ public class RestDigestClient {
 			for (DafaTollgatePushEntity dafaTollgatePushEntity : dafaSendList) {
 				List<DafaTollgatePushEntity> sendList = new ArrayList<>();
 				Subscribe subscribe = subscribeCache.getSubscribeInfo(dafaTollgatePushEntity.getSubscribeID());
+				if(subscribe == null || subscribe.getCancelFlag()==1) {
+					logger.info("未找到订阅或者是未进行订阅:"+JSONObject.toJSONString(dafaTollgatePushEntity));
+					return;
+				}
 				String url = subscribe.getReceiveAddr();
 				String subscribeID =  dafaTollgatePushEntity.getSubscribeID();
 				//大华傻逼操作

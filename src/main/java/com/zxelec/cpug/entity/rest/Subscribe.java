@@ -55,7 +55,7 @@ public class Subscribe implements Serializable {
 	private String subscribeCancelPersonId;
 	private String receiveAddrId;
 	private String upSubscribeId;
-	private int cancelFlag;
+	private int cancelFlag;//待定0 表示开启订阅 1表示取消订阅
 	private String tokenURL;
 	private String tUserName;
 	private String tPassword;
@@ -67,6 +67,26 @@ public class Subscribe implements Serializable {
 	private String receiveAddrType;
 	@JsonProperty(value = "SubscribeTopic")
 	private String subscribeTopic;
+	
+	@JsonProperty(value = "Reason")
+	private String reason; //理由
+	@JsonProperty(value = "CancelReason")
+	private String cancelReason; //取消原因
+	
+	
+	
+	public String getReason() {
+		return reason;
+	}
+	public void setReason(String reason) {
+		this.reason = reason;
+	}
+	public String getCancelReason() {
+		return cancelReason;
+	}
+	public void setCancelReason(String cancelReason) {
+		this.cancelReason = cancelReason;
+	}
 	public String getSubscribeID() {
 		return subscribeID;
 	}

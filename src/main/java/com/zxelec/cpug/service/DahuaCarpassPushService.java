@@ -10,11 +10,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -33,10 +31,14 @@ import com.zxelec.cpug.entity.MotionVehicleType;
 import com.zxelec.cpug.entity.rest.CameraRows;
 import com.zxelec.cpug.entity.rest.CarpassPushEntity;
 import com.zxelec.cpug.entity.rest.DafaCamPushEntity;
-import com.zxelec.cpug.entity.rest.DahuaSubscribeReq;
+import com.zxelec.cpug.entity.rest.DafaLanePushEntity;
+import com.zxelec.cpug.entity.rest.DafaTollgatePushEntity;
 import com.zxelec.cpug.entity.rest.DeviceList;
 import com.zxelec.cpug.entity.rest.ImagePicLoad;
+import com.zxelec.cpug.entity.rest.LaneList;
+import com.zxelec.cpug.entity.rest.Lanes;
 import com.zxelec.cpug.entity.rest.Subscribe;
+import com.zxelec.cpug.entity.rest.TollgateList;
 import com.zxelec.cpug.entity.rest.TollgateRows;
 import com.zxelec.cpug.util.CustomServerProperties;
 import com.zxelec.cpug.util.DateUtils;
@@ -76,7 +78,13 @@ public class DahuaCarpassPushService {
 		}
 		List<Subscribe> writeSub = subscribeCache.getAllSubscribeList();
 		this.writeSubscribeJson(writeSub);
-		this.sendCamDahua(deviceSubscribe);//不管新增和修改都需要发送
+		//0表示开启订阅
+		List<Subscribe> cancelList = deviceSubscribe.stream()
+													.filter(c -> 0 == c.getCancelFlag())
+													.collect(Collectors.toList());
+		if(null != cancelList && cancelList.size()>0) {
+			this.sendCamDahua(deviceSubscribe);//不管新增和修改都需要发送
+		}
 		logger.info("设备【cam】订阅   end。。。");
 	}
 	/**
@@ -111,6 +119,42 @@ public class DahuaCarpassPushService {
 		logger.info("卡口信息【Tollgate】订阅   end。。。");
 	}
 	
+	/**
+	 * 车道订阅推送接口
+	 * @param 车道推送对象
+	 */
+	public void laneSubscribe(List<Subscribe> laneSubscribe) {
+		logger.info("车道信息【Lane】订阅start");
+		// 获取所有的信息
+		for (Subscribe subscribe : laneSubscribe) {
+			subscribeCache.put(subscribe.getSubscribeID(), subscribe);
+		}
+		List<Subscribe> writeSub = subscribeCache.getAllSubscribeList();
+		this.writeSubscribeJson(writeSub);
+		this.sendLaneDahua(laneSubscribe);//不管新增和修改都需要发送		
+		logger.info("车道信息【Lane】订阅   end。。。");
+	}
+	
+	
+	/**
+	 * 发送卡口数据
+	 * @param subList
+	 */
+	public void sendLaneDahua(List<Subscribe> subList) {
+		// 判断此订阅ID是否已经发送给过点位信息，
+		// 循环发送点位信息
+		if (subList.size() > 0) {
+			//需要发送的数据源
+			List<TollgateRows> tollgateRows = tollgateCache.getAll();
+			List<DafaLanePushEntity> laneList = this.encapsulatioDafaLanePushEntity(subList,tollgateRows);
+			if (!laneList.isEmpty()) {
+				//只要是新订阅则就需要发送
+				restDigestClient.sendNoDigestDafaLane(laneList);
+			}
+		}else {
+			logger.info("没有订阅。。。。。");
+		}
+	}
 	
 	/**
 	 * 发送卡口数据
@@ -122,10 +166,10 @@ public class DahuaCarpassPushService {
 		if (subList.size() > 0) {
 			//需要发送的数据源
 			List<TollgateRows> tollgateRows = tollgateCache.getAll();
-			List<DafaCamPushEntity> tollgateList = null;//this.encapsulatioDafaCamPushEntity(subList,tollgateRows);
+			List<DafaTollgatePushEntity> tollgateList = this.encapsulatioDafaTollgatePushEntity(subList,tollgateRows);
 			if (!tollgateList.isEmpty()) {
 				//只要是新订阅则就需要发送
-				restDigestClient.sendNoDigestDafaCam(tollgateList);
+				restDigestClient.sendNoDigestDafaTollgate(tollgateList);
 			}
 		}else {
 			logger.info("没有订阅。。。。。");
@@ -202,6 +246,100 @@ public class DahuaCarpassPushService {
 		logger.info("异步发送 end ！");
 	}
 
+	
+	/**
+	 * 封装发送车道信息
+	 * 
+	 * @param list
+	 */
+	private List<DafaLanePushEntity> encapsulatioDafaLanePushEntity(List<Subscribe> subList,List<TollgateRows> tollgateRows) {
+		List<LaneList> sendLaneList = new ArrayList<>();
+		/**
+		 * 封装需要发送的设备
+		 */
+		if (tollgateRows != null && tollgateRows.size() > 0) {// 必须要有相机数据才能发送
+			for (TollgateRows t : tollgateRows) {
+				List<Lanes> lanes = t.getLanes();
+				for (Lanes lane : lanes) {
+					LaneList laneList = new LaneList();
+					laneList.setTollgateID(t.getId());
+					laneList.setLaneId(lane.getLaneId());
+					laneList.setLaneNo(lane.getLaneNo());
+					laneList.setName(lane.getName());
+					laneList.setDirection(lane.getDirection());
+					laneList.setCityPass(lane.getCityPass());
+					laneList.setDeviceID(lane.getApeID());
+					sendLaneList.add(laneList);
+				}
+				
+			}
+		}
+		List<DafaLanePushEntity> sendList = new ArrayList<>();
+		//需要发送多少个地址
+		for (Subscribe subscribe : subList) {
+			DafaLanePushEntity entity = new DafaLanePushEntity();
+			String notificationID = customServerProperties.getCpugDomainId() + DateUtils.data2String();
+			entity.setNotificationID(notificationID);
+			entity.setSubscribeID(subscribe.getSubscribeID());
+			entity.setTitle(subscribe.getTitle());
+			entity.setTriggerTime(new Date());
+			entity.setLaneList(sendLaneList);
+			sendList.add(entity);
+		}
+		return sendList;
+	}
+	
+	/**
+	 * 封装发送卡口信息
+	 * 
+	 * @param list
+	 */
+	private List<DafaTollgatePushEntity> encapsulatioDafaTollgatePushEntity(List<Subscribe> subList,List<TollgateRows> tollgateRows) {
+		List<TollgateList> tollgateList = new ArrayList<>();
+		/**
+		 * 封装需要发送的设备
+		 */
+		if (tollgateRows != null && tollgateRows.size() > 0) {// 必须要有相机数据才能发送
+			for (TollgateRows t : tollgateRows) {
+				TollgateList tollgate = new TollgateList();
+				tollgate.setTollgateID(t.getId());
+				tollgate.setName(t.getName());
+				tollgate.setLongtidude(t.getLongitude());
+				tollgate.setLatitude(t.getLatitude());
+				tollgate.setPlaceCode(t.getPlaceCode());
+				tollgate.setPlace(t.getPlace());
+				tollgate.setStatus(t.getStatus());
+				try {
+					if(StringUtils.isEmpty(t.getTollgateType())) {
+						tollgate.setTollgateType(80);
+					}else {
+						tollgate.setTollgateType(Integer.parseInt(t.getTollgateType()));
+					}
+				}catch (RuntimeException e) {
+					tollgate.setTollgateType(80);
+				}
+				tollgate.setLaneNum(t.getLaneNum());
+				tollgate.setOrgCode(t.getOrgCode());
+				tollgate.setActiveTime(t.getActiveTime());
+				tollgateList.add(tollgate);
+			}
+		}
+		List<DafaTollgatePushEntity> sendList = new ArrayList<>();
+		//需要发送多少个地址
+		for (Subscribe subscribe : subList) {
+			DafaTollgatePushEntity entity = new DafaTollgatePushEntity();
+			String notificationID = customServerProperties.getCpugDomainId() + DateUtils.data2String();
+			entity.setNotificationID(notificationID);
+			entity.setSubscribeID(subscribe.getSubscribeID());
+			entity.setTitle(subscribe.getTitle());
+			entity.setTriggerTime(new Date());
+			entity.setTollgateList(tollgateList);
+			sendList.add(entity);
+		}
+		return sendList;
+	}
+	
+	
 	/**
 	 * 封装发送设备信息
 	 * 

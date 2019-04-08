@@ -46,6 +46,9 @@ public class DafaSubscribeController {
 		List<Subscribe> deviceSubscribe = subscribe.stream().filter(c -> "2".equals(c.getSubscribeCategory())).collect(Collectors.toList());
 		//过车记录采集订阅
 		List<Subscribe> carSubscribe = subscribe.stream().filter(c -> "3".equals(c.getSubscribeCategory())).collect(Collectors.toList());
+		//车道订阅采集订阅
+		List<Subscribe> laneSubscribe = subscribe.stream().filter(c -> "6".equals(c.getSubscribeCategory())).collect(Collectors.toList());
+				
 		if(deviceSubscribe!=null && deviceSubscribe.size()>0) {
 			dahuaCarpassPushService.deviceSubscribe(deviceSubscribe);
 		}
@@ -54,6 +57,9 @@ public class DafaSubscribeController {
 		}
 		if(carSubscribe!=null && carSubscribe.size()>0) {
 			dahuaCarpassPushService.carSubscribe(carSubscribe);
+		}
+		if(laneSubscribe!=null && laneSubscribe.size()>0) {
+			dahuaCarpassPushService.laneSubscribe(laneSubscribe);
 		}
 		return new DahuaSubscribeRsp("0", "200", "订阅成功", id, "");
 	}
