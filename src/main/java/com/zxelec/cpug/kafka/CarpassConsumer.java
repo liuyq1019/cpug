@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson.JSONObject;
 import com.zxelec.cpug.cache.SubscribeCache;
@@ -71,6 +72,13 @@ public class CarpassConsumer {
 				return;
 			}
 			this.getPicBase64(type, vissMessage.getBinaryData());
+			/**
+			 * 大华专用配置
+			 */
+			//如果近景照片为null，则获取远景照片放入近景中、已经和大华确认
+			if(StringUtils.isEmpty(type.getStorageUrl1())) {
+				type.setStorageUrl1(type.getStorageUrl3());
+			}
 			dahuaCarpassPushService.sendDahuaCar(type,subscribeList);
 		}else {
 			logger.info("过车记录没进行订阅：" + JSONObject.toJSONString(vissMessage.getBody()));

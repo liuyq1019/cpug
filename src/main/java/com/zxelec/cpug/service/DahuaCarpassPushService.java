@@ -249,11 +249,8 @@ public class DahuaCarpassPushService {
 	 */
 	@Async("asyncServiceExecutor")
 	public void sendDahuaCar(MotionVehicleType motionVehicle,List<Subscribe> subscribeList) {
-		logger.info("异步发送start");
 		List<CarpassPushEntity> datfCar = this.encapsulationDafaCarPushReq(motionVehicle);
-//		logger.info(JSONObject.toJSONString(datfCar));
 		restDigestClient.sendNoDigestDafaCar(datfCar,subscribeList);
-		logger.info("异步发送 end ！");
 	}
 
 	

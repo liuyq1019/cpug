@@ -83,10 +83,12 @@ public class RestDigestClient {
 				req.setMotorVehicleObjectList(motorVehicleObjectList);
 				list.add(req);
 				String booy = JSONObject.toJSONString(list);
+				logger.info("过车记录:"+booy);
 				HttpEntity entity = new StringEntity(booy, "utf-8");
 				httpPost.setEntity(entity);
 				httpPost.setConfig(this.setRequestConfig());
 				try {
+					
 					HttpResponse response = httpclient.execute(httpPost);
 					if (response.getStatusLine().getStatusCode() == 200) {
 						String eng = EntityUtils.toString(response.getEntity(), "UTF-8");
@@ -99,11 +101,11 @@ public class RestDigestClient {
 						}
 					} else {
 						logger.error("发送数据：【" + JSONObject.toJSONString(list) + "】\n " + "响应失败："
-								+ response.getStatusLine().getStatusCode());
+								+ response.getStatusLine().getStatusCode()+"\n url:"+url);
 					}
 				} catch (IOException e) {
 					logger.error("发送数据：【" + JSONObject.toJSONString(list) + "】\n " + "未知异常sendNoDigestDafaCar:"
-							+ e.getMessage());
+							+ e.getMessage()+"\n url:"+url);
 				}
 			}
 		} finally {
