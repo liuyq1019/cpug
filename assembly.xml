@@ -35,7 +35,7 @@
 		
 		<fileSet>
 			<directory>bin</directory>
-			<outputDirectory>${file.separator}bin/</outputDirectory>
+			<outputDirectory>${file.separator}</outputDirectory>
 		</fileSet>
 		
 		<fileSet>

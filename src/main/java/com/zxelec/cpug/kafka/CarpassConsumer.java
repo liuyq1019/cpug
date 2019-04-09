@@ -81,7 +81,7 @@ public class CarpassConsumer {
 			}
 			dahuaCarpassPushService.sendDahuaCar(type,subscribeList);
 		}else {
-			logger.info("过车记录未进行订阅：" + JSONObject.toJSONString(vissMessage.getBody()));
+			logger.error("过车记录未进行订阅：" + JSONObject.toJSONString(vissMessage.getBody()));
 		}
 	}
 
