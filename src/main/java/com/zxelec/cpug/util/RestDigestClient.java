@@ -83,7 +83,6 @@ public class RestDigestClient {
 				req.setMotorVehicleObjectList(motorVehicleObjectList);
 				list.add(req);
 				String booy = JSONObject.toJSONString(list);
-				logger.info("过车记录:"+booy);
 				HttpEntity entity = new StringEntity(booy, "utf-8");
 				httpPost.setEntity(entity);
 				httpPost.setConfig(this.setRequestConfig());
@@ -94,17 +93,15 @@ public class RestDigestClient {
 						String eng = EntityUtils.toString(response.getEntity(), "UTF-8");
 						DahuaSubscribeRsp subRsp = JSONObject.parseObject(eng, DahuaSubscribeRsp.class);
 						if (!"0".equals(subRsp.getStatusCode())) {
-							logger.error("发送数据：【" + JSONObject.toJSONString(list) + "】 \n" + "通知失败："
-									+ JSONObject.toJSONString(subRsp));
+							logger.error("发送过车记录失败：【" + booy + "】");
 						}else {
-							logger.info("发送成功！！");
+							logger.info("发送过车记录成功：【"+booy+"】");
 						}
 					} else {
-						logger.error("发送数据：【" + JSONObject.toJSONString(list) + "】\n " + "响应失败："
-								+ response.getStatusLine().getStatusCode()+"\n url:"+url);
+						logger.error("发送过车记录失败：【" + booy + "】\n " + "响应失败：\n url:【"+url+"】");
 					}
 				} catch (IOException e) {
-					logger.error("发送数据：【" + JSONObject.toJSONString(list) + "】\n " + "未知异常sendNoDigestDafaCar:"
+					logger.error("发送数据：【" + booy + "】\n " + "未知异常sendNoDigestDafaCar:"
 							+ e.getMessage()+"\n url:"+url);
 				}
 			}
@@ -157,17 +154,16 @@ public class RestDigestClient {
 						String eng = EntityUtils.toString(response.getEntity(), "UTF-8");
 						DahuaSubscribeRsp subRsp = JSONObject.parseObject(eng, DahuaSubscribeRsp.class);
 						if (!"0".equals(subRsp.getStatusCode())) {
-							logger.error("发送数据：【" + JSONObject.toJSONString(sendList) + "】 \n" + "通知失败："
-									+ JSONObject.toJSONString(subRsp));
+							logger.error("发送CAM数据失败：【" + body + "】 \n url:" + url);
 						}else {
-							logger.info(JSONObject.toJSONString(sendList));
+							logger.info("发送CAM数据成功：【"+body+"】");
 						}
 					} else {
-						logger.error("发送数据：【" + JSONObject.toJSONString(sendList) + "】\n " + "响应失败："
+						logger.error("发送CAM数据失败：【" + body + "】\n " + "响应失败："
 								+ response.getStatusLine().getStatusCode());
 					}
 				} catch (IOException e) {
-					logger.error("发送数据：【" + JSONObject.toJSONString(sendList) + "】\n " + "未知异常sendNoDigestDafaCar:"
+					logger.error("发送数据：【" + JSONObject.toJSONString(sendList) + "】\n url:"+url + "\t 未知异常sendNoDigestDafaCar:"
 							+ e.getMessage());
 				}
 			}
@@ -221,17 +217,15 @@ public class RestDigestClient {
 						String eng = EntityUtils.toString(response.getEntity(), "UTF-8");
 						DahuaSubscribeRsp subRsp = JSONObject.parseObject(eng, DahuaSubscribeRsp.class);
 						if (!"0".equals(subRsp.getStatusCode())) {
-							logger.error("发送数据：【" + JSONObject.toJSONString(sendList) + "】 \n" + "通知失败："
-									+ JSONObject.toJSONString(subRsp));
+							logger.error("发送车道数据失败：【" + body + "】 \n url：" + url);
 						}else {
-							logger.info(JSONObject.toJSONString(sendList));
+							logger.info("发送车道数据成功：【"+body+"】");
 						}
 					} else {
-						logger.error("发送数据：【" + JSONObject.toJSONString(sendList) + "】\n " + "响应失败："
-								+ response.getStatusLine().getStatusCode());
+						logger.error("发送数据：【" + body + "】\n url：" +url);
 					}
 				} catch (IOException e) {
-					logger.error("发送数据：【" + JSONObject.toJSONString(sendList) + "】\n " + "未知异常sendNoDigestDafaCar:"
+					logger.error("发送数据：【" + body + "】\n url:"+ url + " \n 未知异常sendNoDigestDafaCar:"
 							+ e.getMessage());
 				}
 			}
@@ -285,17 +279,17 @@ public class RestDigestClient {
 						String eng = EntityUtils.toString(response.getEntity(), "UTF-8");
 						DahuaSubscribeRsp subRsp = JSONObject.parseObject(eng, DahuaSubscribeRsp.class);
 						if (!"0".equals(subRsp.getStatusCode())) {
-							logger.error("发送数据：【" + JSONObject.toJSONString(sendList) + "】 \n" + "通知失败："
+							logger.error("发送卡口数据失败：【" + body + "】 \n" + "通知失败："
 									+ JSONObject.toJSONString(subRsp));
 						}else {
-							logger.info(JSONObject.toJSONString(sendList));
+							logger.info("发送卡口数据失败：【"+body+"】");
 						}
 					} else {
-						logger.error("发送数据：【" + JSONObject.toJSONString(sendList) + "】\n " + "响应失败："
+						logger.error("发送数据：【" + body + "】\n " + "响应失败："
 								+ response.getStatusLine().getStatusCode());
 					}
 				} catch (IOException e) {
-					logger.error("发送数据：【" + JSONObject.toJSONString(sendList) + "】\n " + "未知异常sendNoDigestDafaCar:"
+					logger.error("发送数据：【" + body + "】\n " + "未知异常sendNoDigestDafaCar:"
 							+ e.getMessage());
 				}
 			}
@@ -375,10 +369,10 @@ public class RestDigestClient {
 			if (response.getStatusLine().getStatusCode() == 200) {
 				respBody = EntityUtils.toString(response.getEntity(), "UTF-8");
 			} else {
-				logger.error("图片响应失败：" + response.getStatusLine().getStatusCode());
+				logger.error("获取viss平台数据失败：" + body+ response.getStatusLine().getStatusCode());
 			}
 		} catch (IOException e) {
-			logger.error("sendVissDigest：" + e.getMessage());
+			logger.error("获取viss平台数据失败：" + e.getMessage());
 		} finally {
 			try {
 				if (null != httpclient) {
@@ -412,10 +406,10 @@ public class RestDigestClient {
 			if (response.getStatusLine().getStatusCode() == 200) {
 				respBody = EntityUtils.toString(response.getEntity(), "UTF-8");
 			} else {
-				logger.error("访问VISS_CPBS失败：" + response.getStatusLine().getStatusCode());
+				logger.error("访问VISS_CPBS失败："+ url + response.getStatusLine().getStatusCode());
 			}
 		} catch (IOException e) {
-			logger.error(" 访问VISS_CPBS失败 sendVissDigest：" + e.getMessage());
+			logger.error(" 访问VISS_CPBS失败 sendVissDigest："+ url + e.getMessage());
 		} finally {
 			try {
 				if (null != httpclient) {

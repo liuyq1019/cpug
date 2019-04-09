@@ -118,14 +118,14 @@
             <!-- 这儿为trace表示什么都可以打印出来了,其他几个级别分别为：TRACE、DEBUG、INFO、WARN、ERROR和FATAL -->
             <Appender-Ref ref="Console"/>
             <Appender-Ref ref="INFO"/>
-            <!-- <Appender-Ref ref="ERROR"/>
-            <Appender-Ref ref="FATAL"/> -->
+            <Appender-Ref ref="ERROR"/>
+            <Appender-Ref ref="FATAL"/>
             <!-- <Appender-Ref ref="ALL"/> -->
         </Root>
         
         <Logger name="org.apache" level="ERROR"/>
         <Logger name="org.springframework" includeLocation="true" level="INFO" additivity="true">
-            <Appender-Ref ref="Console"/>
+           <!--  <Appender-Ref ref="Console"/> -->
             <Appender-Ref ref="ERROR"/>
         </Logger>
         

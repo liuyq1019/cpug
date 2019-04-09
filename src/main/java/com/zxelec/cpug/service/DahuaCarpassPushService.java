@@ -73,7 +73,7 @@ public class DahuaCarpassPushService {
 	 */
 	@Async("asyncServiceExecutor")
 	public void deviceSubscribe(List<Subscribe> deviceSubscribe) {
-		logger.info("设备【cam】订阅start");
+//		logger.info("设备【cam】订阅start");
 		for (Subscribe subscribe : deviceSubscribe) {
 			subscribeCache.put(subscribe.getSubscribeID(), subscribe);
 		}
@@ -86,21 +86,21 @@ public class DahuaCarpassPushService {
 		if(null != cancelList && cancelList.size()>0) {
 			this.sendCamDahua(deviceSubscribe);//不管新增和修改都需要发送
 		}
-		logger.info("设备【cam】订阅   end。。。");
+//		logger.info("设备【cam】订阅   end。。。");
 	}
 	/**
 	 * 过车记录订阅
 	 */
 	@Async("asyncServiceExecutor")
 	public void carSubscribe(List<Subscribe> carSubscribe) {
-		logger.info("过车记录【car】订阅start");
+//		logger.info("过车记录【car】订阅start");
 		// 获取所有的信息
 		for (Subscribe subscribe : carSubscribe) {
 			subscribeCache.put(subscribe.getSubscribeID(), subscribe);
 		}
 		List<Subscribe> writeSub = subscribeCache.getAllSubscribeList();
 		this.writeSubscribeJson(writeSub);
-		logger.info("过车记录【car】订阅   end。。。");
+//		logger.info("过车记录【car】订阅   end。。。");
 	}
 	
 	
@@ -109,7 +109,7 @@ public class DahuaCarpassPushService {
 	 * @param tollgetSubscribe
 	 */
 	public void tollgateSubscribe(List<Subscribe> tollgetSubscribe) {
-		logger.info("卡口信息【Tollgate】订阅start");
+//		logger.info("卡口信息【Tollgate】订阅start");
 		// 获取所有的信息
 		for (Subscribe subscribe : tollgetSubscribe) {
 			subscribeCache.put(subscribe.getSubscribeID(), subscribe);
@@ -117,7 +117,7 @@ public class DahuaCarpassPushService {
 		List<Subscribe> writeSub = subscribeCache.getAllSubscribeList();
 		this.writeSubscribeJson(writeSub);
 		this.sendTollgateDahua(tollgetSubscribe);//不管新增和修改都需要发送		
-		logger.info("卡口信息【Tollgate】订阅   end。。。");
+//		logger.info("卡口信息【Tollgate】订阅   end。。。");
 	}
 	
 	/**
@@ -125,7 +125,7 @@ public class DahuaCarpassPushService {
 	 * @param 车道推送对象
 	 */
 	public void laneSubscribe(List<Subscribe> laneSubscribe) {
-		logger.info("车道信息【Lane】订阅start");
+//		logger.info("车道信息【Lane】订阅start");
 		// 获取所有的信息
 		for (Subscribe subscribe : laneSubscribe) {
 			subscribeCache.put(subscribe.getSubscribeID(), subscribe);
@@ -133,7 +133,7 @@ public class DahuaCarpassPushService {
 		List<Subscribe> writeSub = subscribeCache.getAllSubscribeList();
 		this.writeSubscribeJson(writeSub);
 		this.sendLaneDahua(laneSubscribe);//不管新增和修改都需要发送		
-		logger.info("车道信息【Lane】订阅   end。。。");
+//		logger.info("车道信息【Lane】订阅   end。。。");
 	}
 	/**
 	 * 删除订阅
@@ -508,88 +508,4 @@ public class DahuaCarpassPushService {
 		}
 		logger.info("end executeAsync");
 	}
-	
-	
-//	/**
-//	 * 大华发起订阅后进行后续逻辑处理
-//	 * 
-//	 * @param dahuaSubscribeReq
-//	 * @return
-//	 */
-//	@Async("asyncServiceExecutor")
-//	@Deprecated
-//	public void resultSubscribeInfo(DahuaSubscribeReq dahuaSubscribeReq) {
-//		logger.info("异步处理设备信息开始。。。。。");
-//		/**
-//		 * 将订阅信息写入文件
-//		 */
-//		List<Subscribe> sendCamSub = new ArrayList<>();// 存储需要发送订阅的点位信息
-//		// 获取所有的信息
-//		List<Subscribe> allSubList = subscribeCache.getAllSubscribeData();
-//		if (allSubList == null) {
-//			allSubList = new ArrayList<Subscribe>();
-//		}
-//		
-//		List<Subscribe> listSb = dahuaSubscribeReq.getSubscribeList().getSubscribe();
-//		for (Subscribe subscribe : listSb) {
-//			if (null == subscribeCache.getSubscribeInfo(subscribe.getSubscribeID())) {
-//				allSubList.add(subscribe);
-//				// 没有添加过的点位信息
-//				sendCamSub.add(subscribe);
-//			}
-//		}
-//		this.writeSubscribeJson(allSubList);
-//		subscribeCache.putSubscribeInfo(allSubList);
-//		this.sendCamDahu(sendCamSub);
-//		logger.info("异步推送设备信息结束。。。。。");
-//	}
-//	/**
-//	 * 
-//	 * @param id 需要取消ID
-//	 * @param subscribe 需要取消的对象 
-//	 */
-//	@Deprecated
-//	public void cancelSubscribe(String id,Subscribe subscribe) {
-//		List<Subscribe> writeList = new ArrayList<>();
-//		// 获取订阅所有的信息
-//		List<Subscribe> allList = subscribeCache.getAllSubscribeData();
-//		//排除不需要取消的订阅信息
-//		List<Subscribe> noCancelList = allList.stream().
-//				filter(c -> !id.equals(c.getSubscribeID())).collect(Collectors.toList());
-//		writeList.addAll(noCancelList);
-//		writeList.add(subscribe);
-//		this.writeSubscribeJson(writeList);
-//		subscribeCache.putSubscribeInfo(writeList);
-//	}
-//	
-//	/**
-//	 * 修改订阅
-//	 * @param dahuaSubscribeReq 待修改的集合对象
-//	 */
-//	@Deprecated
-//	@Async("asyncServiceExecutor")
-//	public void updateSubscribe(DahuaSubscribeReq dahuaSubscribeReq) {
-//		logger.info("取消订阅开始。。。。。");
-//		/**
-//		 * 将订阅信息写入文件
-//		 */
-//		List<Subscribe> writeList = new ArrayList<>();
-//		// 获取订阅所有的信息
-//		List<Subscribe> allList = subscribeCache.getAllSubscribeData();
-//		// 获取请求对象的订阅信息
-//		List<Subscribe> cancelList = dahuaSubscribeReq.getSubscribeList().getSubscribe();
-//		if(cancelList !=null && cancelList.size()>0) {//需要修改的内容
-//			//需要修改订阅的对象数据
-//			Map<String,Subscribe> cancelMap = cancelList.stream().
-//					collect(Collectors.toMap(Subscribe::getSubscribeID, Function.identity()));
-//			//没有修改订阅的对象
-//			List<Subscribe> noCancelList = allList.stream().
-//					filter(c -> !cancelMap.containsKey(c.getSubscribeID())).collect(Collectors.toList());
-//			writeList.addAll(cancelList);
-//			writeList.addAll(noCancelList);
-//			this.writeSubscribeJson(writeList);
-//			subscribeCache.putSubscribeInfo(writeList);
-//		}
-//		logger.info("取消订阅结束。。。。。");
-//	}
 }
