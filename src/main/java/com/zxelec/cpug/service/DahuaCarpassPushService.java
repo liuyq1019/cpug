@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -134,6 +135,15 @@ public class DahuaCarpassPushService {
 		this.sendLaneDahua(laneSubscribe);//不管新增和修改都需要发送		
 		logger.info("车道信息【Lane】订阅   end。。。");
 	}
+	/**
+	 * 删除订阅
+	 * @param subscribeID 订阅ID
+	 */
+	public void delSubscribe(String subscribeID) {
+		subscribeCache.removeSubscribe(subscribeID);//删除缓存后更新文件
+		List<Subscribe> writeSub = subscribeCache.getAllSubscribeList();
+		this.writeSubscribeJson(writeSub);
+	}
 	
 	
 	/**
@@ -238,11 +248,11 @@ public class DahuaCarpassPushService {
 	 * 发送过车记录
 	 */
 	@Async("asyncServiceExecutor")
-	public void sendDahuaCar(MotionVehicleType motionVehicle) {
+	public void sendDahuaCar(MotionVehicleType motionVehicle,List<Subscribe> subscribeList) {
 		logger.info("异步发送start");
 		List<CarpassPushEntity> datfCar = this.encapsulationDafaCarPushReq(motionVehicle);
-		logger.info(JSONObject.toJSONString(datfCar));
-		restDigestClient.sendNoDigestDafaCar(datfCar);
+//		logger.info(JSONObject.toJSONString(datfCar));
+		restDigestClient.sendNoDigestDafaCar(datfCar,subscribeList);
 		logger.info("异步发送 end ！");
 	}
 
@@ -389,8 +399,8 @@ public class DahuaCarpassPushService {
 		List<CarpassPushEntity> motorVehicleObjectList = new ArrayList<>();
 		// for (MotionVehicleType motionVehicleType : motionVehicle) {
 		CarpassPushEntity pushEntity = new CarpassPushEntity();
-		pushEntity.setMotorVehicleID(motionVehicleType.getId() + motionVehicleType.getMotorVehicleID());
-		pushEntity.setSourceID(motionVehicleType.getSerialID());
+		pushEntity.setMotorVehicleID(motionVehicleType.getMotorVehicleID());
+		pushEntity.setSourceID(motionVehicleType.getTollgateID());
 		pushEntity.setTransportID(motionVehicleType.getTollgateID());
 		pushEntity.setDeviceID(motionVehicleType.getDeviceID());
 		pushEntity.setStorageUrl1(motionVehicleType.getStorageUrl1());// 发送图片后获取到
@@ -402,30 +412,92 @@ public class DahuaCarpassPushService {
 		pushEntity.setLeftTopY(0);// 左上角Y坐标
 		pushEntity.setRightBtmX(0);// 右下角X坐标
 		pushEntity.setRightBtmY(0);// 右下角Y坐标
-		pushEntity.setPlateClass(motionVehicleType.getRearPlateClass());// 号牌种类
+		if(StringUtils.isEmpty(motionVehicleType.getPlateClass())) {//如果为null 复制为99
+			pushEntity.setPlateClass("99");// 号牌种类
+		}else {
+			pushEntity.setPlateClass(motionVehicleType.getPlateClass());// 号牌种类
+		}
 		pushEntity.setPlateColor(motionVehicleType.getPlateColor());// 车牌颜色
 		pushEntity.setPlateNo(motionVehicleType.getPlateNo());
 		pushEntity.setSpeed(motionVehicleType.getSpeed());// 行驶速度
 		pushEntity.setDirection(motionVehicleType.getDirection());// 方向
-		pushEntity.setVehicleClass(motionVehicleType.getVehicleClass());// 车辆类型
+		pushEntity.setVehicleClass(vehicleClassTransformation(motionVehicleType.getVehicleClass()));// 车辆类型
 		pushEntity.setVehicleBrand(motionVehicleType.getVehicleBrand());
 		if (!StringUtils.isEmpty(motionVehicleType.getVehicleLength())) {
 			try {
-				pushEntity.setVehicleLength(Integer.parseInt(motionVehicleType.getVehicleLength()));
+				int vehicleLength = Integer.parseInt(motionVehicleType.getVehicleLength());
+				if(vehicleLength>=0) {
+					pushEntity.setVehicleLength(vehicleLength);
+				}
 			} catch (RuntimeException e) {
 				logger.error("数据类型转换失败:" + motionVehicleType.getVehicleLength());
 			}
 		}
-		pushEntity.setVehicleWidth(motionVehicleType.getVehicleWidth());
-		pushEntity.setVehicleHeight(motionVehicleType.getVehicleHeight());
-		pushEntity.setVehicleColor(motionVehicleType.getVehicleColor() + "");
-		pushEntity.setVehicleColorDepth(motionVehicleType.getVehicleColorDepth() + "");
+		if(motionVehicleType.getVehicleWidth()>=0) {
+			pushEntity.setVehicleWidth(motionVehicleType.getVehicleWidth());
+		}
+		if(motionVehicleType.getVehicleHeight()>=0) {
+			pushEntity.setVehicleHeight(motionVehicleType.getVehicleHeight());
+		}
+		try {
+			Integer vColor = Integer.parseInt(motionVehicleType.getVehicleColor());
+			pushEntity.setVehicleColor(vColor+"");
+		}catch (RuntimeException e) {
+			logger.error("车辆颜色类型转换失败:"+motionVehicleType.getVehicleColor());
+		}
+		if(motionVehicleType.getVehicleColorDepth()>=0) {
+			pushEntity.setVehicleColorDepth(motionVehicleType.getVehicleColorDepth() + "");
+		}else {
+			pushEntity.setVehicleColorDepth("0");
+		}
 		pushEntity.setPassTime(motionVehicleType.getPassTime());// 过车时间
-		pushEntity.setLaneID(motionVehicleType.getLaneNo());// 车道号
-		pushEntity.setLaneNo(motionVehicleType.getLaneNo());// 车道号
+		pushEntity.setLaneId(motionVehicleType.getLaneNo());// 车道号
 		pushEntity.setPlaceCode(motionVehicleType.getNameOfPassedRoad());// 安装地点行政区划代码
 		motorVehicleObjectList.add(pushEntity);
 		return motorVehicleObjectList;
+	}
+	
+	
+	private List<String> daList = Arrays.asList("K10","K11","K12","K13","K14","K15",
+			"K16","K17","H10","H11","H12","H13","H14","H15","H16","H17","H18","H19","Q10","Q11","Q12","Z11","Z51"
+			,"T11","J11","J12","J13","G10","G11","G12","G13","G14","G15","G16","G17","G18","G19","B10","B11","B12",
+			"B13","B14","B15","B16","B17","B18","B19","B1A","B1B");
+	private	List<String> zxList = Arrays.asList("K20","K21","K22","K23","K24","K25","K27","H20",
+			"H21","H22","H23","H24","H25","H26","H27","H28","H29","Q20","Q21","Q22","Z21","G20","G21","G22",
+			"G23","G24","G25","G26","G27","G28","G29","B20","B21","B22","B23","B24","B25","B26","B27","B28","B29");
+	private	List<String> xxList = Arrays.asList("K30","K31","K32","K33","K34","K40","K41","K42","K43","H30","H31","H32","H33","H34","H35","H37","H38","H39","H40","H41","H42","H43","H44","H45","H46","H47","H50","Q30","Q31","Q32","Z31","Z41","Z71","T20","T21","T22","T23","G30","G31","G32","G33","G34","G35","G36","G37","G38","B2A","B2B","B30","B31","B32","B33","B34","B35","B36","B37","B38","B39");
+	private	List<String> qtList = Arrays.asList("X99","D12","D11");
+	private	List<String> eList = Arrays.asList("M11","M12","M20","M21","M22");
+	private	List<String> sList = Arrays.asList("M10","M13","M14","M15","N11");
+	private	List<String> xhcList = Arrays.asList("H51","H52","H53","H54","H55");
+	/**
+	 * 车辆类型转换
+	 * @param vehicleClass
+	 * @return
+	 */
+	private String vehicleClassTransformation(String vehicleClass) {
+		if(daList.contains(vehicleClass)) {
+			return "3";
+		}
+		if(zxList.contains(vehicleClass)) {
+			return "2";
+		}
+		if(xxList.contains(vehicleClass)) {
+			return "1";
+		}
+		if(qtList.contains(vehicleClass)) {
+			return "4";
+		}
+		if(eList.contains(vehicleClass)) {
+			return "6";
+		}
+		if(sList.contains(vehicleClass)) {
+			return "7";
+		}
+		if(xhcList.contains(vehicleClass)) {
+			return "14";
+		}
+		return "0";
 	}
 
 	@Async("asyncServiceExecutor")

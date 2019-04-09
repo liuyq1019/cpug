@@ -35,7 +35,7 @@ public class ScheduledJob {
 		List<Subscribe> subList = subscribeCache.getAllSubscribeList();
 		//订阅信息需要是相机订阅，且为开启订阅状态
 		List<Subscribe> camList = subList.stream()
-										 .filter(c -> ("3".equals(c.getSubscribeCategory())&& 0 == c.getCancelFlag()))
+										 .filter(c -> ("2".equals(c.getSubscribeCategory())&& 0 == c.getCancelFlag()))
 										 .collect(Collectors.toList());
 		dahuaCarpassPushService.sendCamDahua(camList);
 		//订阅信息需要是卡口订阅，且为开启订阅状态

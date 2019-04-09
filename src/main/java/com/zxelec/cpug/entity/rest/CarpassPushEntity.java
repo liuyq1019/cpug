@@ -37,6 +37,7 @@ public class CarpassPushEntity implements Serializable{
 	
 	@JSONField(name = "StorageUrl5")
     private String storageUrl5;
+	
 	@JSONField(name = "LeftTopX")
     private int leftTopX;
 	@JSONField(name = "LeftTopY")
@@ -45,6 +46,7 @@ public class CarpassPushEntity implements Serializable{
     private int rightBtmX;
 	@JSONField(name = "RightBtmY")
     private int rightBtmY;
+	
 	@JSONField(name = "PlateClass")
     private String plateClass;
 	@JSONField(name = "PlateColor")
@@ -75,20 +77,36 @@ public class CarpassPushEntity implements Serializable{
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
 	@JSONField(name = "PassTime",format="yyyy-MM-dd HH:mm:ss")
     private Date passTime;
-	@JSONField(name = "LaneID")
-    private int laneID;
+	@JSONField(name = "LaneId")
+    private int laneId;
 	@JSONField(name = "PlaceCode")
     private String placeCode;
 	
-	@JSONField(name = "LaneNo")
-	private int laneNo;
 	
 	
-	public int getLaneNo() {
-		return laneNo;
+	public int getLeftTopX() {
+		return leftTopX;
 	}
-	public void setLaneNo(int laneNo) {
-		this.laneNo = laneNo;
+	public void setLeftTopX(int leftTopX) {
+		this.leftTopX = leftTopX;
+	}
+	public int getLeftTopY() {
+		return leftTopY;
+	}
+	public void setLeftTopY(int leftTopY) {
+		this.leftTopY = leftTopY;
+	}
+	public int getRightBtmX() {
+		return rightBtmX;
+	}
+	public void setRightBtmX(int rightBtmX) {
+		this.rightBtmX = rightBtmX;
+	}
+	public int getRightBtmY() {
+		return rightBtmY;
+	}
+	public void setRightBtmY(int rightBtmY) {
+		this.rightBtmY = rightBtmY;
 	}
 	public String getVehicleBrand() {
 		return vehicleBrand;
@@ -132,30 +150,7 @@ public class CarpassPushEntity implements Serializable{
 	public void setStorageUrl2(String storageUrl2) {
 		this.storageUrl2 = storageUrl2;
 	}
-	public int getLeftTopX() {
-		return leftTopX;
-	}
-	public void setLeftTopX(int leftTopX) {
-		this.leftTopX = leftTopX;
-	}
-	public int getLeftTopY() {
-		return leftTopY;
-	}
-	public void setLeftTopY(int leftTopY) {
-		this.leftTopY = leftTopY;
-	}
-	public int getRightBtmX() {
-		return rightBtmX;
-	}
-	public void setRightBtmX(int rightBtmX) {
-		this.rightBtmX = rightBtmX;
-	}
-	public int getRightBtmY() {
-		return rightBtmY;
-	}
-	public void setRightBtmY(int rightBtmY) {
-		this.rightBtmY = rightBtmY;
-	}
+	
 	public String getPlateClass() {
 		return plateClass;
 	}
@@ -228,11 +223,13 @@ public class CarpassPushEntity implements Serializable{
 	public void setPassTime(Date passTime) {
 		this.passTime = passTime;
 	}
-	public int getLaneID() {
-		return laneID;
+	
+	
+	public int getLaneId() {
+		return laneId;
 	}
-	public void setLaneID(int laneID) {
-		this.laneID = laneID;
+	public void setLaneId(int laneId) {
+		this.laneId = laneId;
 	}
 	public String getPlaceCode() {
 		return placeCode;

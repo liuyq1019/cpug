@@ -59,15 +59,10 @@ public class RestDigestClient {
 	 * 
 	 * @param carList
 	 */
-	public void sendNoDigestDafaCar(List<CarpassPushEntity> motorVehicleObjectList) {
-		List<Subscribe> listSub = subscribeCache.getAllSubscribeList();
-		//需要状态为订阅且接口为过车
-		List<Subscribe> sList = listSub.stream()
-				.filter(c -> (0 == c.getCancelFlag()&& "3" == c.getSubscribeCategory()))
-				.collect(Collectors.toList());
+	public void sendNoDigestDafaCar(List<CarpassPushEntity> motorVehicleObjectList,List<Subscribe> subscribeList) {
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		try {
-			for (Subscribe subscribe : sList) {
+			for (Subscribe subscribe : subscribeList) {
 				String subscribeID = subscribe.getSubscribeID();
 				List<DafaCarPushReq> list = new ArrayList<>();
 				DafaCarPushReq req = new DafaCarPushReq();
@@ -99,6 +94,8 @@ public class RestDigestClient {
 						if (!"0".equals(subRsp.getStatusCode())) {
 							logger.error("发送数据：【" + JSONObject.toJSONString(list) + "】 \n" + "通知失败："
 									+ JSONObject.toJSONString(subRsp));
+						}else {
+							logger.info("发送成功！！");
 						}
 					} else {
 						logger.error("发送数据：【" + JSONObject.toJSONString(list) + "】\n " + "响应失败："

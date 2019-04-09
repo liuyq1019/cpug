@@ -80,6 +80,21 @@ public class SubscribeCache {
 			readLock.unlock();
 		}
 	}
+	
+	/**
+	 * 删除自定信息
+	 * @param subscribeID
+	 */
+	public void removeSubscribe(String subscribeID) {
+		Lock writeLock = readWriteLock.writeLock();
+		try {
+			writeLock.lock();
+			subMap.remove(subscribeID);
+		} finally {
+			writeLock.unlock();
+		}
+		
+	}
 
 	/**
 	 * 获取全部订阅信息
@@ -114,6 +129,7 @@ public class SubscribeCache {
 			readLock.unlock();
 		}
 	}
+
 	
 	
 //	/**

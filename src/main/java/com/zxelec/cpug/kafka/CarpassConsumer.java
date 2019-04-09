@@ -44,7 +44,7 @@ public class CarpassConsumer {
 	/**
 	 * 1. 订阅 MOTION_VEHICLE_SUBSCRIPTION 获取过车记录.
 	 */
-//	@KafkaListener(topics = { "motion-vehicle-notification" })
+	@KafkaListener(topics = { "motion-vehicle-notification" })
 	public void carpassMessage(byte[] message) {
 		// 获取到数据后并解析为对象后先想
 		try {
@@ -62,20 +62,17 @@ public class CarpassConsumer {
 	 * @param vissMessage
 	 */
 	private void convert2CarPassedAndSend(VissMessage<MotionVehicleType> vissMessage) {
-		List<Subscribe> subscribeList = subscribeCache.getAllSubscribeList();
-		if (null != subscribeList && !subscribeList.isEmpty()) {// 订阅后才能处理
-			List<Subscribe> sList = subscribeList.stream().filter(c -> 0 == c.getStatus()).collect(Collectors.toList());
-			if(sList!=null && sList.size()>0) {
-				MotionVehicleType type = vissMessage.getBody();
-				if (type.getPictures() == null || type.getPictures().length <= 0) {// 如果没有图片则不进行数据处理
-					return;
-				}
-				this.getPicBase64(type, vissMessage.getBinaryData());
-				dahuaCarpassPushService.sendDahuaCar(type);
-			}else {
-				logger.info("有订阅但是被取消：" + JSONObject.toJSONString(vissMessage.getBody()));
+		List<Subscribe> subscribeList = subscribeCache.getAllSubscribeList().stream()
+					 .filter(c -> (0 == c.getCancelFlag()&& "3" .equals(c.getSubscribeCategory())))
+					 .collect(Collectors.toList());
+		if(subscribeList!=null && subscribeList.size()>0) {
+			MotionVehicleType type = vissMessage.getBody();
+			if (type.getPictures() == null || type.getPictures().length <= 0) {// 如果没有图片则不进行数据处理
+				return;
 			}
-		} else {
+			this.getPicBase64(type, vissMessage.getBinaryData());
+			dahuaCarpassPushService.sendDahuaCar(type,subscribeList);
+		}else {
 			logger.info("过车记录没进行订阅：" + JSONObject.toJSONString(vissMessage.getBody()));
 		}
 	}
