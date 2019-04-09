@@ -18,6 +18,6 @@ spring:
       group-id: car #消费者组
       auto-offset-reset: latest #从最近的地方开始消费
       auto-commit-interval: 100
-      max-poll-records: 1
+      max-poll-records: 10
       
      

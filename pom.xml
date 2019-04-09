@@ -89,6 +89,25 @@
 							<outputDirectory>${project.build.directory}/resources</outputDirectory>
 						</configuration>
 					</execution>
+					
+					<execution> <!-- 复制配置文件 -->
+						<id>copy-doc</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<resources>
+								<resource>
+									<directory>doc</directory>
+									<includes>
+										<!-- <include>*.properties</include> -->
+									</includes>
+								</resource>
+							</resources>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 

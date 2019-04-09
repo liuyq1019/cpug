@@ -18,12 +18,12 @@ if [ -z $1 ];then
     echo_help
     exit 1
 fi
-if [ ! -d "$LOG_DIR" ];then
-    mkdir "$LOG_DIR"
-fi
-if [ ! -f "$LOG_PATH" ];then
-    touch "$LOG_DIR"
-fi
+#if [ ! -d "$LOG_DIR" ];then
+    #mkdir "$LOG_DIR"#不创建日志文件目录
+#fi
+#if [ ! -f "$LOG_PATH" ];then
+    #touch "$LOG_DIR"#不创建文件
+#fi
 
 if [ "$1" == "start" ];then
 # check server
