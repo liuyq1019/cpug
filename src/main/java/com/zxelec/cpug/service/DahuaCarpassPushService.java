@@ -73,7 +73,7 @@ public class DahuaCarpassPushService {
 	 */
 	@Async("asyncServiceExecutor")
 	public void deviceSubscribe(List<Subscribe> deviceSubscribe) {
-//		logger.info("设备【cam】订阅start");
+		logger.info("设备【cam】订阅start");
 		for (Subscribe subscribe : deviceSubscribe) {
 			subscribeCache.put(subscribe.getSubscribeID(), subscribe);
 		}
@@ -86,21 +86,21 @@ public class DahuaCarpassPushService {
 		if(null != cancelList && cancelList.size()>0) {
 			this.sendCamDahua(deviceSubscribe);//不管新增和修改都需要发送
 		}
-//		logger.info("设备【cam】订阅   end。。。");
+		logger.info("设备【cam】订阅   end。。。");
 	}
 	/**
 	 * 过车记录订阅
 	 */
 	@Async("asyncServiceExecutor")
 	public void carSubscribe(List<Subscribe> carSubscribe) {
-//		logger.info("过车记录【car】订阅start");
+		logger.info("过车记录【car】订阅start");
 		// 获取所有的信息
 		for (Subscribe subscribe : carSubscribe) {
 			subscribeCache.put(subscribe.getSubscribeID(), subscribe);
 		}
 		List<Subscribe> writeSub = subscribeCache.getAllSubscribeList();
 		this.writeSubscribeJson(writeSub);
-//		logger.info("过车记录【car】订阅   end。。。");
+		logger.info("过车记录【car】订阅   end。。。");
 	}
 	
 	
@@ -109,7 +109,7 @@ public class DahuaCarpassPushService {
 	 * @param tollgetSubscribe
 	 */
 	public void tollgateSubscribe(List<Subscribe> tollgetSubscribe) {
-//		logger.info("卡口信息【Tollgate】订阅start");
+		logger.info("卡口信息【Tollgate】订阅start");
 		// 获取所有的信息
 		for (Subscribe subscribe : tollgetSubscribe) {
 			subscribeCache.put(subscribe.getSubscribeID(), subscribe);
@@ -117,7 +117,7 @@ public class DahuaCarpassPushService {
 		List<Subscribe> writeSub = subscribeCache.getAllSubscribeList();
 		this.writeSubscribeJson(writeSub);
 		this.sendTollgateDahua(tollgetSubscribe);//不管新增和修改都需要发送		
-//		logger.info("卡口信息【Tollgate】订阅   end。。。");
+		logger.info("卡口信息【Tollgate】订阅   end。。。");
 	}
 	
 	/**
@@ -125,7 +125,7 @@ public class DahuaCarpassPushService {
 	 * @param 车道推送对象
 	 */
 	public void laneSubscribe(List<Subscribe> laneSubscribe) {
-//		logger.info("车道信息【Lane】订阅start");
+		logger.info("车道信息【Lane】订阅start");
 		// 获取所有的信息
 		for (Subscribe subscribe : laneSubscribe) {
 			subscribeCache.put(subscribe.getSubscribeID(), subscribe);
@@ -133,7 +133,7 @@ public class DahuaCarpassPushService {
 		List<Subscribe> writeSub = subscribeCache.getAllSubscribeList();
 		this.writeSubscribeJson(writeSub);
 		this.sendLaneDahua(laneSubscribe);//不管新增和修改都需要发送		
-//		logger.info("车道信息【Lane】订阅   end。。。");
+		logger.info("车道信息【Lane】订阅   end。。。");
 	}
 	/**
 	 * 删除订阅
