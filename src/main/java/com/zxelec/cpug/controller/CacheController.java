@@ -21,6 +21,7 @@ import com.zxelec.cpug.cache.SubscribeCache;
 import com.zxelec.cpug.cache.TollgateCache;
 import com.zxelec.cpug.entity.rest.DafaCarPushReq;
 import com.zxelec.cpug.entity.rest.DahuaSubscribeRsp;
+import com.zxelec.cpug.init.CpbsBasicDataInit;
 import com.zxelec.cpug.service.DahuaCarpassPushService;
 import com.zxelec.cpug.util.RestDigestClient;
 
@@ -44,6 +45,9 @@ public class CacheController {
 	
 	@Autowired
 	private TollgateCache tollgateCache;
+	
+	@Autowired
+	private CpbsBasicDataInit cpbsBasicDataService;
 	/**
 	 * 查看缓存信息
 	 */
@@ -58,7 +62,16 @@ public class CacheController {
 		}
 		return "type信息不正确!【cam,subscribe,tollgate】";
 	}
-	
+	/**
+	 * 刷新相机和卡口列表缓存
+	 * @return
+	 */
+	@RequestMapping("/refresh")
+	public String refreshCache() {
+		cpbsBasicDataService.sendCpbsCam();
+		cpbsBasicDataService.sendCpbsTollgate();
+		return "刷新成功";
+	}
 	
 	/**
 	 * 返回版本信息
