@@ -47,6 +47,60 @@ public class CustomServerProperties {
 	@Value("${cpug.viss.password}")
 	private String cpugVissPassword;
 	
+	//线程池维护线程的最少数量
+	@Value("${cpug.core.poolSize}")
+	private int cpugCorePoolSize;
+	//#线程池维护线程的最大数量
+	@Value("${cpug.core.poolSize}")
+	private int cpugMaxPoolSize;
+	//#缓存队列
+	@Value("${cpug.queue.capacity}")
+	private int cpugQueueCapacity;
+	//#允许的空闲时间
+	@Value("${cpug.keepAlive}")
+	private int cpugKeepAlive;
+	
+
+	public int getCpugCorePoolSize() {
+		return cpugCorePoolSize;
+	}
+
+
+	public void setCpugCorePoolSize(int cpugCorePoolSize) {
+		this.cpugCorePoolSize = cpugCorePoolSize;
+	}
+
+
+	public int getCpugMaxPoolSize() {
+		return cpugMaxPoolSize;
+	}
+
+
+	public void setCpugMaxPoolSize(int cpugMaxPoolSize) {
+		this.cpugMaxPoolSize = cpugMaxPoolSize;
+	}
+
+
+	public int getCpugQueueCapacity() {
+		return cpugQueueCapacity;
+	}
+
+
+	public void setCpugQueueCapacity(int cpugQueueCapacity) {
+		this.cpugQueueCapacity = cpugQueueCapacity;
+	}
+
+
+	public int getCpugKeepAlive() {
+		return cpugKeepAlive;
+	}
+
+
+	public void setCpugKeepAlive(int cpugKeepAlive) {
+		this.cpugKeepAlive = cpugKeepAlive;
+	}
+
+
 	public String getCpugLunId() {
 		return cpugLunId;
 	}
