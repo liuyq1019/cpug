@@ -51,7 +51,7 @@
                 TimeBasedTriggeringPolicy指定的size是1，结合起来就是每1天生成一个新文件
         -->
 
-        <RollingRandomAccessFile name="INFO" fileName="${LOG_HOME}/${FILE_NAME}.log" filePattern="${LOG_HOME}/${FILE_NAME}_%d{yyyy-MM-dd}_%i.log.gz">
+        <RollingRandomAccessFile name="INFO" fileName="${LOG_HOME}/${FILE_NAME}.log" filePattern="${LOG_HOME}/${FILE_NAME}-info-%d{yyyy-MM-dd}_%i.log.gz">
             <Filters>
             	  <!--日志级别：TRACE < DEBUG < INFO < WARN < ERROR < FATAL   控制台只输出level及其以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
                 <ThresholdFilter level="WARN" onMatch="DENY" onMismatch="NEUTRAL"/>
@@ -62,11 +62,17 @@
                 <TimeBasedTriggeringPolicy interval="1"/>
                 <SizeBasedTriggeringPolicy size="200MB"/>
             </Policies>
-            <DefaultRolloverStrategy max="5"/>
+            <!-- <CronTriggeringPolicy schedule="* * * * * ?"/> -->
+            <DefaultRolloverStrategy max="10">
+                <Delete basePath="${LOG_HOME}/" maxDepth="10">
+                    <IfFileName glob="*info*.gz" />
+                    <IfLastModified age="168H" />
+                </Delete>
+            </DefaultRolloverStrategy>
         </RollingRandomAccessFile>
-
+		
         <!--错误信息记录-->
-        <RollingRandomAccessFile name="ERROR" fileName="${LOG_HOME}/${FILE_NAME}-error.log" filePattern="${LOG_HOME}/${FILE_NAME}-error_%d{yyyy-MM-dd}_%i.log.gz">
+        <RollingRandomAccessFile name="ERROR" fileName="${LOG_HOME}/${FILE_NAME}-error.log" filePattern="${LOG_HOME}/${FILE_NAME}-error-%d{yyyy-MM-dd}_%i.log.gz">
             <Filters>
                 <ThresholdFilter level="FATAL" onMatch="DENY" onMismatch="NEUTRAL"/>
                 <ThresholdFilter level="WARN" onMatch="ACCEPT" onMismatch="DENY"/>
@@ -76,11 +82,18 @@
                 <TimeBasedTriggeringPolicy interval="1"/>
                 <SizeBasedTriggeringPolicy size="200MB"/>
             </Policies>
-            <DefaultRolloverStrategy max="5"/>
+            <!-- 每天生产文件个数最多10个 -->
+            <DefaultRolloverStrategy max="10">
+                <Delete basePath="${LOG_HOME}/" maxDepth="10">
+                    <IfFileName glob="*error*.gz" />
+                    <!-- 保留7天日志 -->
+                    <IfLastModified age="168H" />
+                </Delete>
+            </DefaultRolloverStrategy>
         </RollingRandomAccessFile>
 
         <!--系统级别的错误信息-->
-        <RollingRandomAccessFile name="FATAL" fileName="${LOG_HOME}/${FILE_NAME}-fatal.log" filePattern="${LOG_HOME}/${FILE_NAME}-fatal%d{yyyy-MM-dd}_%i.log.gz">
+        <RollingRandomAccessFile name="FATAL" fileName="${LOG_HOME}/${FILE_NAME}-fatal.log" filePattern="${LOG_HOME}/${FILE_NAME}-fatal-%d{yyyy-MM-dd}_%i.log.gz">
             <Filters>
                 <ThresholdFilter level="FATAL" onMatch="ACCEPT" onMismatch="DENY"/>
             </Filters>
@@ -89,25 +102,43 @@
                 <TimeBasedTriggeringPolicy interval="1"/>
                 <SizeBasedTriggeringPolicy size="200MB"/>
             </Policies>
-            <DefaultRolloverStrategy max="5"/>
+            <!-- 每天生产文件个数最多10个 -->
+            <DefaultRolloverStrategy max="10">
+                <Delete basePath="${LOG_HOME}/" maxDepth="10">
+                    <IfFileName glob="*fatal*.gz" />
+                    <!-- 保留7天日志 -->
+                    <IfLastModified age="168H" />
+                </Delete>
+            </DefaultRolloverStrategy>
         </RollingRandomAccessFile>
 
         <!--全部日志信息:DEBUG及以上级别-->
-        <RollingRandomAccessFile name="ALL" fileName="${LOG_HOME}/${FILE_NAME}-all.log" filePattern="${LOG_HOME}/${FILE_NAME}-all%d{yyyy-MM-dd}_%i.log.gz">
+        <RollingRandomAccessFile name="ALL" fileName="${LOG_HOME}/${FILE_NAME}-all.log" filePattern="${LOG_HOME}/${FILE_NAME}-all-%d{yyyy-MM-dd}_%i.log.gz">
             <Filters>
                	<ThresholdFilter level="TRACE" onMatch="ACCEPT" onMismatch="DENY"/>
             </Filters>
             <PatternLayout pattern="%d{yyyy-MM-dd 'at' HH:mm:ss z} %-5level %class{36} %L %M - %msg%xEx%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1"/>
-                <SizeBasedTriggeringPolicy size="200MB"/>
+                <SizeBasedTriggeringPolicy size="400MB"/>
             </Policies>
-            <DefaultRolloverStrategy max="5"/>
+             <!-- 每天生产文件个数最多10个 -->
+            <DefaultRolloverStrategy max="10">
+                <Delete basePath="${LOG_HOME}/" maxDepth="10">
+                    <IfFileName glob="*all*.gz" />
+                    <!-- 保留7天日志 -->
+                    <IfLastModified age="168H" />
+                </Delete>
+            </DefaultRolloverStrategy>
         </RollingRandomAccessFile>
 
         <!--配置异步写日志-->
         <Async name="Async">
             <AppenderRef ref="ALL"/>
+            <AppenderRef ref="INFO"/>
+            <AppenderRef ref="ERROR"/>
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="FATAL"/>
         </Async>
 
     </Appenders>
@@ -125,7 +156,7 @@
         
         <Logger name="org.apache" level="ERROR"/>
         <Logger name="org.springframework" includeLocation="true" level="INFO" additivity="true">
-           <!--  <Appender-Ref ref="Console"/> -->
+            <Appender-Ref ref="Console"/>
             <Appender-Ref ref="ERROR"/>
         </Logger>
         
