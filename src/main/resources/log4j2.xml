@@ -135,10 +135,10 @@
         <!--配置异步写日志-->
         <Async name="Async">
             <AppenderRef ref="ALL"/>
-            <AppenderRef ref="INFO"/>
+           <!--  <AppenderRef ref="INFO"/>
             <AppenderRef ref="ERROR"/>
             <AppenderRef ref="Console"/>
-            <AppenderRef ref="FATAL"/>
+            <AppenderRef ref="FATAL"/> -->
         </Async>
 
     </Appenders>
