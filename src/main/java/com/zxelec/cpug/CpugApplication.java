@@ -1,14 +1,14 @@
 package com.zxelec.cpug;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.AutoConfigurationExcludeFilter;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.boot.context.TypeExcludeFilter;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
-import org.springframework.context.annotation.ComponentScans;
 import org.springframework.context.annotation.FilterType;
 
 import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure;
@@ -19,8 +19,14 @@ import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure;
  */
 @SpringBootApplication(exclude = { DruidDataSourceAutoConfigure.class, DataSourceAutoConfiguration.class,
 		DataSourceTransactionManagerAutoConfiguration.class, HibernateJpaAutoConfiguration.class })
+@ComponentScan(
+		basePackages = {"com.zxelec.cpug.config"},
+		excludeFilters = {
+				@Filter(type = FilterType.REGEX,pattern = "com.zxelec.cpug.ferry.*"),
+				@Filter(type = FilterType.REGEX,pattern = "com.zxelec.cpug.vl.*")
+		}
+)
 public class CpugApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(CpugApplication.class, args);
 	}
