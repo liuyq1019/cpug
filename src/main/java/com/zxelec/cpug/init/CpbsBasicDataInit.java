@@ -45,7 +45,7 @@ public class CpbsBasicDataInit{
 	private RestDigestClient restDigestClient;
 	
 	
-	@PostConstruct
+//	@PostConstruct
 	public void init() {
 		this.sendCpbsCam();
 		this.sendCpbsTollgate();
