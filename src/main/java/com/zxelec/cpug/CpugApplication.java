@@ -20,11 +20,11 @@ import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure;
 @SpringBootApplication(exclude = { DruidDataSourceAutoConfigure.class, DataSourceAutoConfiguration.class,
 		DataSourceTransactionManagerAutoConfiguration.class, HibernateJpaAutoConfiguration.class })
 @ComponentScan(
-		basePackages = {"com.zxelec.cpug.config"},
-		excludeFilters = {
-				@Filter(type = FilterType.REGEX,pattern = "com.zxelec.cpug.ferry.*"),
-				@Filter(type = FilterType.REGEX,pattern = "com.zxelec.cpug.vl.*")
-		}
+		basePackages = {"com.zxelec.cpug.config"}
+//		,excludeFilters = {
+//				@Filter(type = FilterType.REGEX,pattern = "com.zxelec.cpug.ferry.*"),
+//				@Filter(type = FilterType.REGEX,pattern = "com.zxelec.cpug.vl.*")
+//		}
 )
 public class CpugApplication {
 	public static void main(String[] args) {

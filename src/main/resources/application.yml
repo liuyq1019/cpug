@@ -1,7 +1,7 @@
 server:
   port: 8360
 
-#debug: true
+debug: true
 
 spring:
   kafka:
@@ -24,5 +24,5 @@ spring:
   profiles:
     #prod、dev 
     active:
-    - dev  
+    - prod  
      

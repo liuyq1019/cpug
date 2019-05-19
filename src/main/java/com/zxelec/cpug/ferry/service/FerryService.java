@@ -9,7 +9,7 @@ import com.zxelec.cpug.ferry.mapper.EmployeeMapper;
 @Service
 public class FerryService {
 	
-//	@Autowired
+	@Autowired
 	private EmployeeMapper employeeMapper;
 	
 	public Employee getEmpId(Integer id) {
