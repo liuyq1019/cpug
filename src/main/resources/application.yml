@@ -1,9 +1,15 @@
 server:
   port: 8360
 
-debug: true
+#debug: true
 
 spring:
+  datasource:
+    druid:
+      driver-class-name: com.mysql.jdbc.Driver
+      db-type: com.alibaba.druid.pool.DruidDataSource
+  jpa: 
+    show-sql: true
   kafka:
     producer:
       bootstrap-servers: #生产者配置
@@ -24,5 +30,5 @@ spring:
   profiles:
     #prod、dev 
     active:
-    - prod  
+    - dev  
      
