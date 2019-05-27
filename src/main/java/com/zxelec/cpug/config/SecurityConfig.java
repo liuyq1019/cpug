@@ -25,14 +25,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.csrf().disable().authorizeRequests()
-		.anyRequest()
-		.authenticated()
-		.and()
-		.exceptionHandling()
-		.authenticationEntryPoint(digestEntryPoint())//摘要认证入口端点
-		.and()
-		.addFilter(digestFilter());//在过滤链中添加摘要认证过滤器
+		http.csrf().disable().authorizeRequests().antMatchers("/**").permitAll();
+//		.anyRequest()
+//		.authenticated()
+//		.and()
+//		.exceptionHandling()
+//		.authenticationEntryPoint(digestEntryPoint())//摘要认证入口端点
+//		.and()
+//		.addFilter(digestFilter());//在过滤链中添加摘要认证过滤器
 	}
 	
 	@Bean

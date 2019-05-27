@@ -9,6 +9,8 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfigurat
 import org.springframework.boot.context.TypeExcludeFilter;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.context.annotation.FilterType;
 
 import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure;
@@ -17,15 +19,13 @@ import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure;
  * @author Administrator
  *
  */
-@SpringBootApplication(exclude = { DruidDataSourceAutoConfigure.class, DataSourceAutoConfiguration.class,
-		DataSourceTransactionManagerAutoConfiguration.class, HibernateJpaAutoConfiguration.class })
-@ComponentScan(
-		basePackages = {"com.zxelec.cpug.config"}
-//		,excludeFilters = {
-//				@Filter(type = FilterType.REGEX,pattern = "com.zxelec.cpug.ferry.*"),
-//				@Filter(type = FilterType.REGEX,pattern = "com.zxelec.cpug.vl.*")
-//		}
-)
+@SpringBootApplication(exclude = { DruidDataSourceAutoConfigure.class, 
+		DataSourceAutoConfiguration.class,
+		DataSourceTransactionManagerAutoConfiguration.class, 
+		HibernateJpaAutoConfiguration.class })
+@EnableScheduling
+@ComponentScan("com.zxelec.cpug.config")
+@EnableTransactionManagement
 public class CpugApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(CpugApplication.class, args);
