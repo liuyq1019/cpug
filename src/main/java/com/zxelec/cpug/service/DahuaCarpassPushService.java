@@ -41,6 +41,7 @@ import com.zxelec.cpug.entity.rest.Lanes;
 import com.zxelec.cpug.entity.rest.Subscribe;
 import com.zxelec.cpug.entity.rest.TollgateList;
 import com.zxelec.cpug.entity.rest.TollgateRows;
+import com.zxelec.cpug.init.JsonDataInit;
 import com.zxelec.cpug.util.CustomServerProperties;
 import com.zxelec.cpug.util.DateUtils;
 import com.zxelec.cpug.util.RestDigestClient;
@@ -52,6 +53,9 @@ public class DahuaCarpassPushService {
 
 	@Autowired
 	private SubscribeCache subscribeCache;
+	
+	@Autowired
+	private JsonDataInit jsonDataInit;
 
 	@Autowired
 	private CameraCache cameraCache;
@@ -101,6 +105,17 @@ public class DahuaCarpassPushService {
 		List<Subscribe> writeSub = subscribeCache.getAllSubscribeList();
 		this.writeSubscribeJson(writeSub);
 		logger.info("过车记录【car】订阅   end。。。");
+		
+		//判断是订阅还是取消订阅
+		List<Subscribe> subscribeList = carSubscribe.stream()
+				 .filter(c -> (0 == c.getCancelFlag()&& "3" .equals(c.getSubscribeCategory())))
+				 .collect(Collectors.toList());
+		if(subscribeList!=null && subscribeList.size()>0) {
+			jsonDataInit.kafkaListenerConfig(true);
+		}else {
+			jsonDataInit.kafkaListenerConfig(false);
+		}
+		
 	}
 	
 	
