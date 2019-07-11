@@ -450,8 +450,8 @@ public class RestDigestClient {
 	 */
 	private RequestConfig setRequestConfig() {
 		RequestConfig requestConfig = RequestConfig.custom()  
-		        .setConnectTimeout(15000).setConnectionRequestTimeout(15000)  
-		        .setSocketTimeout(15000).build();
+		        .setConnectTimeout(60000).setConnectionRequestTimeout(60000)  
+		        .setSocketTimeout(60000).build();
 		return requestConfig;
 	}
 	
