@@ -1,7 +1,7 @@
 server:
   port: 8360
 
-debug: true
+#debug: true
 
 spring:
   kafka:
@@ -21,8 +21,4 @@ spring:
       auto-offset-reset: latest #从最近的地方开始消费
       auto-commit-interval: 100
       max-poll-records: 10
-  profiles:
-    #prod、dev 
-    active:
-    - prod  
      

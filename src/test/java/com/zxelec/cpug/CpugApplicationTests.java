@@ -8,7 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.zxelec.cpug.vl.util.CustomServerProperties;
+import com.zxelec.cpug.util.CustomServerProperties;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
