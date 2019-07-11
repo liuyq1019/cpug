@@ -42,12 +42,10 @@ public class JsonDataInit{
 	@Autowired
 	private SubscribeCache subscribeCache;
 	
-	@PostConstruct
 	public void init() {
 		this.subscribeJsonInit();
 		initKafka();
 	}
-	
 	
 	
 	/**
