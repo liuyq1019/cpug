@@ -83,8 +83,10 @@ public class RestDigestClient {
 				req.setMotorVehicleObjectList(motorVehicleObjectList);
 				list.add(req);
 				String booy = JSONObject.toJSONString(list);
-				HttpEntity entity = new StringEntity(booy, "utf-8");
-				httpPost.setEntity(entity);
+				StringEntity strentity = new StringEntity(booy, "utf-8");
+				strentity.setContentType("application/json;charset=UTF-8");
+				httpPost.setEntity(strentity);
+				httpPost.setHeader("Content-type", "application/json;charset=UTF-8");
 				httpPost.setConfig(this.setRequestConfig());
 				try {
 					
