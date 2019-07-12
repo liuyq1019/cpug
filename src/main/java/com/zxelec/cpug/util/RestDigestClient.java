@@ -160,7 +160,7 @@ public class RestDigestClient {
 						}
 					} else {
 						logger.error("发送CAM数据失败：【" + body + "】\n " + "响应失败："
-								+ response.getStatusLine().getStatusCode());
+								+ response.getStatusLine().getStatusCode()+"\n"+url);
 					}
 				} catch (IOException e) {
 					logger.error("发送数据：【" + JSONObject.toJSONString(sendList) + "】\n url:"+url + "\t 未知异常sendNoDigestDafaCar:"
@@ -286,7 +286,7 @@ public class RestDigestClient {
 						}
 					} else {
 						logger.error("发送数据：【" + body + "】\n " + "响应失败："
-								+ response.getStatusLine().getStatusCode());
+								+ response.getStatusLine().getStatusCode()+"\n url:"+url);
 					}
 				} catch (IOException e) {
 					logger.error("发送数据：【" + body + "】\n " + "未知异常sendNoDigestDafaCar:"

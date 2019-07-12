@@ -43,7 +43,7 @@ public class CarpassConsumer {
 	/**
 	 * 1. 订阅 MOTION_VEHICLE_SUBSCRIPTION 获取过车记录.
 	 */
-	@KafkaListener(topics = { "motion-vehicle-notification" })
+	@KafkaListener(id = "yhkkCarId",topics = { "motion-vehicle-notification" },groupId = "car_yh")
 	public void carpassMessage(byte[] message) {
 		// 获取到数据后并解析为对象后先想
 		try {
